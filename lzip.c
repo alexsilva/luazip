@@ -6,6 +6,11 @@
 #define BUFSIZE 1024 * 2
 
 
+static struct zip *get_zip_ref(lua_State *L, int n) {
+    return lua_getuserdata(L, lua_getparam(L, n));  // implicit cast
+}
+
+
 /* open zip */
 static void lzip_open(lua_State *L) {
     const char *path = luaL_check_string(L, 1); // file path
@@ -40,10 +45,7 @@ static void lzip_open(lua_State *L) {
 
 /* zip file close */
 static void lzip_close(lua_State *L) {
-    lua_Object ref = lua_getparam(L, 1);
-
-    struct zip * zip_s;
-    zip_s = (struct zip *) lua_getuserdata(L, ref);
+    struct zip * zip_s = get_zip_ref(L, 1);
 
     int ret = zip_close(zip_s);
 
