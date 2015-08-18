@@ -65,7 +65,6 @@ static void lzip_add_file(lua_State *L) {
     const char *sfilepath = luaL_check_string(L, 2);
     const char *tfilename = luaL_check_string(L, 3);
 
-    //zip_source_t *zip_source_file(zip_t *archive, const char *fname, zip_uint64_t start, zip_int64_t len);
     struct zip_source * source_t;
     source_t = zip_source_file(zip_s, sfilepath, 0, -1);
 
