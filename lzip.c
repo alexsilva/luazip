@@ -46,16 +46,40 @@ static void lzip_open(lua_State *L) {
 /* zip file close */
 static void lzip_close(lua_State *L) {
     struct zip * zip_s = get_zip_ref(L, 1);
-
     int ret = zip_close(zip_s);
-
     lua_pushnumber(L, ret);
+}
+
+/* create new directories in the zip file */
+static void lzip_add_dir(lua_State *L) {
+    struct zip * zip_s = get_zip_ref(L, 1);
+    const char *dirname = luaL_check_string(L, 2);
+    zip_int64_t index = zip_add_dir(zip_s, dirname);
+    lua_pushnumber(L, index);
+}
+
+/* create new files in the zip file */
+static void lzip_add_file(lua_State *L) {
+    struct zip * zip_s = get_zip_ref(L, 1);
+
+    const char *sfilepath = luaL_check_string(L, 2);
+    const char *tfilename = luaL_check_string(L, 3);
+
+    //zip_source_t *zip_source_file(zip_t *archive, const char *fname, zip_uint64_t start, zip_int64_t len);
+    struct zip_source * source_t;
+    source_t = zip_source_file(zip_s, sfilepath, 0, -1);
+
+    zip_int64_t index = zip_file_add(zip_s, tfilename, source_t, ZIP_FL_ENC_UTF_8);
+
+    lua_pushnumber(L, index);
 }
 
 
 static struct luaL_reg lzip[] = {
     {"zip_open", lzip_open},
     {"zip_close", lzip_close},
+    {"zip_add_dir", lzip_add_dir},
+    {"zip_add_file", lzip_add_file},
 };
 
 
