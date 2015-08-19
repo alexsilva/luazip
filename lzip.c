@@ -11,7 +11,6 @@
 #define UNZIP_BUF   5120
 
 
-
 static struct zip *get_zip_ref(lua_State *L, int n) {
     struct zip * zip_s = lua_getuserdata(L, lua_getparam(L, n));  // implicit cast
     if (!zip_s)
@@ -285,5 +284,17 @@ int LUA_LIBRARY lua_lzipopen(lua_State *L) {
     // (except if they are explicitly marked as UTF-8). Convert it to UTF-8 before comparing.
     // Note: ASCII is a subset of both CP-437 and UTF-8.
     set_table(L, encoding, "ZIP_FL_ENC_STRICT", ZIP_FL_ENC_STRICT);
+
+    // create the global table unzip
+    lua_Object unzip_states = lua_createtable(L);
+
+    lua_pushobject(L, unzip_states);
+    lua_setglobal(L, "unzip_states");
+
+    // Returned whenever the zip file has been successfully extracted.
+    set_table(L, unzip_states, "UNZIP_SUCCESS", UNZIP_SUCCESS);
+
+    // Returned when an error occurs extraction.
+    set_table(L, unzip_states, "UNZIP_ERROR", UNZIP_ERROR);
     return 0;
 }

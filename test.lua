@@ -40,6 +40,12 @@ print("ZIP_FL_ENC_RAW:", zip_file_encoding.ZIP_FL_ENC_RAW)
 print("ZIP_FL_ENC_GUESS:", zip_file_encoding.ZIP_FL_ENC_GUESS)
 print("ZIP_FL_ENC_STRICT:", zip_file_encoding.ZIP_FL_ENC_STRICT)
 
+print("-------")
+print("unzip_states:", unzip_states)
+print("UNZIP_SUCCESS:", unzip_states.UNZIP_SUCCESS)
+print("UNZIP_ERROR:", unzip_states.UNZIP_ERROR)
+print("-------")
+
 local samples_dir =  root_dir.."/samples"
 local zip_filename = samples_dir .."/sample2.zip";
 
