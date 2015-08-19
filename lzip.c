@@ -7,8 +7,8 @@
 #include <fcntl.h>
 #include "utils.h"
 
-
-#define BUFSIZE 1024 * 2
+#define ZIP_ERRBUF 2048
+#define UNZIP_BUF  5120
 
 
 static struct zip *get_zip_ref(lua_State *L, int n) {
@@ -41,7 +41,7 @@ static void lzip_open(lua_State *L) {
 
     // check for errors
     if (zep > 0) {
-        char buf[BUFSIZE];
+        char buf[ZIP_ERRBUF];
         int slen = zip_error_to_str(buf, sizeof(buf), zep, errno);
         // push error message
         lua_pushlstring(L, buf, slen);
@@ -118,7 +118,7 @@ static void lunzip(lua_State *L) {
     const char *dirname = luaL_check_string(L, 2);
     struct zip_file *zf;
     struct zip_stat sb;
-    char buf[100];
+    char buf[UNZIP_BUF];
     int fd;
     long long sum;
     zip_int64_t len;
@@ -152,7 +152,7 @@ static void lunzip(lua_State *L) {
                 }
                 sum = 0;
                 while (sum != sb.size) {
-                    len = zip_fread(zf, buf, 100);
+                    len = zip_fread(zf, buf, UNZIP_BUF);
                     if (len < 0) {
                         fprintf(stderr, "boese, boese/n");
                         exit(102);
