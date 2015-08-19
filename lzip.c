@@ -63,12 +63,12 @@ static void lzip_add_file(lua_State *L) {
     struct zip * zip_s = get_zip_ref(L, 1);
 
     const char *sfilepath = luaL_check_string(L, 2);
-    const char *tfilename = luaL_check_string(L, 3);
+    const char *tfilepath = luaL_check_string(L, 3);
 
     struct zip_source * source_t;
     source_t = zip_source_file(zip_s, sfilepath, 0, -1);
 
-    zip_int64_t index = zip_file_add(zip_s, tfilename, source_t, ZIP_FL_ENC_UTF_8);
+    zip_int64_t index = zip_file_add(zip_s, tfilepath, source_t, ZIP_FL_ENC_UTF_8);
 
     lua_pushnumber(L, index);
 }
@@ -92,28 +92,28 @@ static struct luaL_reg lzip[] = {
 int LUA_LIBRARY lua_lzipopen(lua_State *L) {
     luaL_openlib(L, lzip, (sizeof(lzip)/sizeof(lzip[0])));
 
-    // zip open modes
-    lua_Object modes = lua_createtable(L);
+    // zip open flags
+    lua_Object flags = lua_createtable(L);
 
     // create the global table flags
-    lua_pushobject(L, modes);
+    lua_pushobject(L, flags);
     lua_setglobal(L, "zip_open_flags");
 
     // ZIP_CHECKCONS: Perform additional stricter consistency checks on the archive, and error if they fail.
-    set_table(L, modes, "ZIP_CHECKCONS", ZIP_CHECKCONS);
+    set_table(L, flags, "ZIP_CHECKCONS", ZIP_CHECKCONS);
 
     // ZIP_CREATE: Create the archive if it does not exist.
-    set_table(L, modes, "ZIP_CREATE", ZIP_CREATE);
+    set_table(L, flags, "ZIP_CREATE", ZIP_CREATE);
 
     // ZIP_EXCL: Error if archive already exists.
-    set_table(L, modes, "ZIP_EXCL", ZIP_EXCL);
+    set_table(L, flags, "ZIP_EXCL", ZIP_EXCL);
 
     // ZIP_TRUNCATE: If archive exists, ignore its current contents. In other words, handle it the same way as an empty archive.
-    set_table(L, modes, "ZIP_TRUNCATE", ZIP_TRUNCATE);
+    set_table(L, flags, "ZIP_TRUNCATE", ZIP_TRUNCATE);
 
     // ZIP_RDONLY: Open archive in read-only mode.
-    // set_table(L, modes, "ZIP_RDONLY:", ZIP_RDONLY);
+    // set_table(L, flags, "ZIP_RDONLY:", ZIP_RDONLY);
 
-    lua_pushobject(L, modes); // end table
+    lua_pushobject(L, flags); // end table
     return 0;
 }
