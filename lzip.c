@@ -40,10 +40,10 @@ static void lzip_open(lua_State *L) {
         int slen = zip_error_to_str(buf, sizeof(buf), zep, errno);
         // push error message
         lua_pushlstring(L, buf, slen);
+    } else {
+        // push zip object opened
+        lua_pushuserdata(L, zip_s);
     }
-
-    // push zip object opened
-    lua_pushuserdata(L, zip_s);
 }
 
 
