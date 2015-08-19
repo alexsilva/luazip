@@ -15,6 +15,14 @@
 #define LUA_LIBRARY __attribute__((visibility("default")))
 #endif
 
+#define UNZIP_SUCCESS  0
+#define UNZIP_ERROR   -1
+
+struct unzip_st {
+    char *msg;
+    int code;
+};
+
 int LUA_LIBRARY lua_lzipopen(lua_State *);
 
 #endif //LUAZIP_LZIP_H
