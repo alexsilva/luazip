@@ -39,15 +39,16 @@ print("ZIP_FL_ENC_RAW:", zip_file_encoding.ZIP_FL_ENC_RAW)
 print("ZIP_FL_ENC_GUESS:", zip_file_encoding.ZIP_FL_ENC_GUESS)
 print("ZIP_FL_ENC_STRICT:", zip_file_encoding.ZIP_FL_ENC_STRICT)
 
-status, zip = zip_open(root_dir.."/samples/sample2.zip", zip_open_flags.ZIP_CREATE)
+local zip_filename = root_dir.."/samples/sample2.zip";
 
-local dirname
+local status, zip = zip_open(zip_filename, zip_open_flags.ZIP_CREATE)
 
 if (status ~= 0) then
     print(format("[%i] %s", status, zip))
 else
-    dirname = "samples"
-    print("Add dir:", zip_add_dir(zip, dirname))
+    local dirname = "zipfile/samples"
+    print("dir created:", zip_add_dir(zip, dirname))
+
     zip_add_file(zip, root_dir.."/samples/sample.zip", dirname.."/sample.zip")
 
     -- num of entries
@@ -57,7 +58,12 @@ else
     print("zip_name_locate: ", zip_name_locate(zip, dirname.."/sample.zip"))
     print("zip_name_locate: ", zip_name_locate(zip, "sample.zip", zip_file_encoding.ZIP_FL_NODIR))
 
-    unzip(zip, root_dir.."/samples/extractfiles")
     print( zip_close(zip) )
 end
 
+status, zip = zip_open(zip_filename)
+
+if (status == 0) then
+    unzip(zip, root_dir.."/samples/extractfiles")
+    print( zip_close(zip) )
+end
