@@ -2,6 +2,11 @@
 #include <errno.h>
 #include "zip.h"
 #include "lzip.h"
+#include <unistd.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include "utils.h"
+
 
 #define BUFSIZE 1024 * 2
 
@@ -107,6 +112,61 @@ static void lzip_name_locate(lua_State *L) {
     lua_pushnumber(L, index); // index of file or -1
 }
 
+/* Extract all the contents of the zip file in the directory. */
+static void lunzip(lua_State *L) {
+    struct zip *zip_s = get_zip_ref(L, 1);
+    const char *dirname = luaL_check_string(L, 2);
+    struct zip_file *zf;
+    struct zip_stat sb;
+    char buf[100];
+    int fd;
+    long long sum;
+    zip_int64_t len;
+    zip_uint64_t index;
+
+    // container dir
+    size_t slen = strlen(dirname);
+
+    if (dirname[slen - 1] != '.')
+        safe_create_dir(dirname);
+
+    for (index = 0; index < zip_get_num_entries(zip_s, 0); index++) {
+        if (zip_stat_index(zip_s, index, 0, &sb) == 0) {
+            len = strlen(sb.name);
+
+            char abspath[len + slen + 1];
+            join(&abspath[0], dirname, sb.name);
+
+            if (sb.name[len - 1] == '/') {
+                safe_create_dir(abspath);
+            } else {
+                zf = zip_fopen_index(zip_s, index, 0);
+                if (!zf) {
+                    fprintf(stderr, "boese, boese/n");
+                    exit(100);
+                }
+                fd = open(abspath, O_RDWR | O_TRUNC | O_CREAT | O_BINARY, 0644);
+                if (fd < 0) {
+                    fprintf(stderr, "boese, boese/n");
+                    exit(101);
+                }
+                sum = 0;
+                while (sum != sb.size) {
+                    len = zip_fread(zf, buf, 100);
+                    if (len < 0) {
+                        fprintf(stderr, "boese, boese/n");
+                        exit(102);
+                    }
+                    write(fd, buf, (unsigned int) len);
+                    sum += len;
+                }
+                close(fd);
+                zip_fclose(zf);
+            }
+        }
+    }
+}
+
 static struct luaL_reg lzip[] = {
     {"zip_open", lzip_open},
     {"zip_close", lzip_close},
@@ -114,7 +174,8 @@ static struct luaL_reg lzip[] = {
     {"zip_add_dir", lzip_add_dir},
     {"zip_add_file", lzip_add_file},
     {"zip_get_num_entries", lzip_get_num_entries},
-    {"zip_name_locate", lzip_name_locate}
+    {"zip_name_locate", lzip_name_locate},
+    {"unzip", lunzip}
 };
 
 
