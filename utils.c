@@ -17,25 +17,26 @@ int create_dir(const char *dir, mode_t mode) {
 #endif
 }
 
+#define PATH_SEP '/'
+
 /* Create a directory tree based on the given path */
 int mkdirs(const char *dir, mode_t mode) {
     assert(dir && *dir);
     char* p;
-    for (p=strchr(dir +1, '/'); p; p=strchr(p+1, '/')) {
+    for (p=strchr(dir +1, PATH_SEP); p; p=strchr(p+1, PATH_SEP)) {
         *p='\0';
         if (create_dir(dir, mode) == -1) {
             if (errno!=EEXIST) {
-                *p='/'; return -1;
+                *p= PATH_SEP; return -1;
             }
         }
-        *p='/';
+        *p= PATH_SEP;
     }
     return 0;
 }
 
 /* Joins two paths considering the platform sep (\\|/)*/
-void join(char* destination, const char* path1, const char* path2)
-{
+void join(char* destination, const char* path1, const char* path2) {
     if(path1 == NULL && path2 == NULL) {
         strcpy(destination, "");;
     }
