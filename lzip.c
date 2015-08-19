@@ -79,6 +79,12 @@ static void lzip_add_file(lua_State *L) {
     lua_pushnumber(L, index);
 }
 
+/* Function returns the number of files in archive. */
+static void lzip_get_num_entries(lua_State *L) {
+    struct zip * zip_s = get_zip_ref(L, 1);
+    zip_int64_t num = zip_get_num_entries(zip_s, ZIP_FL_UNCHANGED);
+    lua_pushnumber(L, num);
+}
 
 static struct luaL_reg lzip[] = {
     {"zip_open", lzip_open},
@@ -86,6 +92,7 @@ static struct luaL_reg lzip[] = {
     {"zip_discard", lzip_discard},
     {"zip_add_dir", lzip_add_dir},
     {"zip_add_file", lzip_add_file},
+    {"zip_get_num_entries", lzip_get_num_entries},
 };
 
 
