@@ -3,25 +3,37 @@
 //
 
 #include "utils.h"
-#include <stdio.h>
 #include <string.h>
 #include <io.h>
 #include <errno.h>
-#include <stdlib.h>
+#include <assert.h>
 
-void safe_create_dir(const char *dir) {
+/* Creates a new directory considering the execution platform */
+int create_dir(const char *dir, mode_t mode) {
 #ifdef __linux__
-    if (mkdir(dir, 0755) < 0) {
+    return mkdir(dir, mode);
 #else
-    if (mkdir(dir) < 0) {
+    return mkdir(dir);
 #endif
-        if (errno != EEXIST) {
-            perror(dir);
-            exit(1);
-        }
-    }
 }
 
+/* Create a directory tree based on the given path */
+int mkdirs(const char *dir, mode_t mode) {
+    assert(dir && *dir);
+    char* p;
+    for (p=strchr(dir +1, '/'); p; p=strchr(p+1, '/')) {
+        *p='\0';
+        if (create_dir(dir, mode) == -1) {
+            if (errno!=EEXIST) {
+                *p='/'; return -1;
+            }
+        }
+        *p='/';
+    }
+    return 0;
+}
+
+/* Joins two paths considering the platform sep (\\|/)*/
 void join(char* destination, const char* path1, const char* path2)
 {
     if(path1 == NULL && path2 == NULL) {

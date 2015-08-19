@@ -7,8 +7,10 @@
 #include <fcntl.h>
 #include "utils.h"
 
-#define ZIP_ERRBUF 2048
-#define UNZIP_BUF  5120
+#define ZIP_ERRBUF  2048
+#define UNZIP_DMODE 0755
+#define UNZIP_BUF   5120
+
 
 
 static struct zip *get_zip_ref(lua_State *L, int n) {
@@ -128,7 +130,7 @@ static void lunzip(lua_State *L) {
     size_t slen = strlen(dirname);
 
     if (dirname[slen - 1] != '.')
-        safe_create_dir(dirname);
+        mkdirs(dirname, UNZIP_DMODE);
 
     for (index = 0; index < zip_get_num_entries(zip_s, 0); index++) {
         if (zip_stat_index(zip_s, index, 0, &sb) == 0) {
@@ -138,7 +140,7 @@ static void lunzip(lua_State *L) {
             join(&abspath[0], dirname, sb.name);
 
             if (sb.name[len - 1] == '/') {
-                safe_create_dir(abspath);
+                mkdirs(abspath, UNZIP_DMODE);
             } else {
                 zf = zip_fopen_index(zip_s, index, 0);
                 if (!zf) {
