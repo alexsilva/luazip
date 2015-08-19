@@ -50,6 +50,12 @@ static void lzip_close(lua_State *L) {
     lua_pushnumber(L, ret);
 }
 
+/* close zip archive and discard changes */
+static void lzip_discard(lua_State *L) {
+    struct zip * zip_s = get_zip_ref(L, 1);
+    zip_discard(zip_s);
+}
+
 /* create new directories in the zip file */
 static void lzip_add_dir(lua_State *L) {
     struct zip * zip_s = get_zip_ref(L, 1);
@@ -77,6 +83,7 @@ static void lzip_add_file(lua_State *L) {
 static struct luaL_reg lzip[] = {
     {"zip_open", lzip_open},
     {"zip_close", lzip_close},
+    {"zip_discard", lzip_discard},
     {"zip_add_dir", lzip_add_dir},
     {"zip_add_file", lzip_add_file},
 };
