@@ -22,6 +22,7 @@ print("zip_add_file:", zip_add_file)
 print("zip_discard:", zip_discard)
 print("zip_get_num_entries:", zip_get_num_entries)
 print("zip_name_locate:", zip_name_locate)
+print("unzip:", unzip)
 
 print("-------")
 print("zip_open_flags:", zip_open_flags)
@@ -56,6 +57,7 @@ else
     print("zip_name_locate: ", zip_name_locate(zip, dirname.."/sample.zip"))
     print("zip_name_locate: ", zip_name_locate(zip, "sample.zip", zip_file_encoding.ZIP_FL_NODIR))
 
+    unzip(zip, root_dir.."/samples/extractfiles")
     print( zip_close(zip) )
 end
 
