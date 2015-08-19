@@ -33,7 +33,7 @@ status, zip = zip_open(root_dir.."/samples/sample2.zip", zip_open_flags.ZIP_CREA
 if (status ~= 0) then
     print(format("[%i] %s", status, zip))
 else
-    local dirname = "mydir"
+    local dirname = "samples"
     print("Add dir:", zip_add_dir(zip, dirname))
     zip_add_file(zip, root_dir.."/samples/sample.zip", dirname.."/sample.zip")
 end
