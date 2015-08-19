@@ -20,6 +20,7 @@ print("zip_close:", zip_close)
 print("zip_dir_add:", zip_dir_add)
 print("zip_add_file:", zip_add_file)
 print("zip_discard:", zip_discard)
+print("zip_get_num_entries:", zip_get_num_entries)
 
 print("-- ATTRS ---")
 print("zip_open_flags:", zip_open_flags)
@@ -38,5 +39,5 @@ else
     zip_add_file(zip, root_dir.."/samples/sample.zip", dirname.."/sample.zip")
 end
 
-
+print("zip_get_num_entries: ", zip_get_num_entries(zip))
 print( zip_close(zip) )
