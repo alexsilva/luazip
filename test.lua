@@ -21,6 +21,7 @@ print("zip_dir_add:", zip_dir_add)
 print("zip_add_file:", zip_add_file)
 print("zip_discard:", zip_discard)
 print("zip_get_num_entries:", zip_get_num_entries)
+print("zip_name_locate:", zip_name_locate)
 
 print("-- ATTRS ---")
 print("zip_open_flags:", zip_open_flags)
@@ -29,15 +30,31 @@ print("ZIP_CREATE: ",    zip_open_flags.ZIP_CREATE)
 print("ZIP_TRUNCATE: ",  zip_open_flags.ZIP_TRUNCATE)
 print("ZIP_RDONLY: ",    zip_open_flags.ZIP_RDONLY)
 
+print("zip_encoding:", zip_file_encoding)
+print("ZIP_FL_NOCASE:", zip_file_encoding.ZIP_FL_NOCASE)
+print("ZIP_FL_NODIR:", zip_file_encoding.ZIP_FL_NODIR)
+print("ZIP_FL_ENC_RAW:", zip_file_encoding.ZIP_FL_ENC_RAW)
+print("ZIP_FL_ENC_GUESS:", zip_file_encoding.ZIP_FL_ENC_GUESS)
+print("ZIP_FL_ENC_STRICT:", zip_file_encoding.ZIP_FL_ENC_STRICT)
+
 status, zip = zip_open(root_dir.."/samples/sample2.zip", zip_open_flags.ZIP_CREATE)
+
+local dirname
 
 if (status ~= 0) then
     print(format("[%i] %s", status, zip))
 else
-    local dirname = "samples"
+    dirname = "samples"
     print("Add dir:", zip_add_dir(zip, dirname))
     zip_add_file(zip, root_dir.."/samples/sample.zip", dirname.."/sample.zip")
+
+    -- num of entries
+    print("zip_get_num_entries: ", zip_get_num_entries(zip))
+
+    -- locate file
+    print("zip_name_locate: ", zip_name_locate(zip, dirname.."/sample.zip"))
+    print("zip_name_locate: ", zip_name_locate(zip, "sample.zip", zip_file_encoding.ZIP_FL_NODIR))
+
+    print( zip_close(zip) )
 end
 
-print("zip_get_num_entries: ", zip_get_num_entries(zip))
-print( zip_close(zip) )
