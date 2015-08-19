@@ -86,6 +86,20 @@ static void lzip_get_num_entries(lua_State *L) {
     lua_pushnumber(L, num);
 }
 
+/* Returns the index of the file named fname or -1, if archive does not contain an entry of that name. */
+static void lzip_name_locate(lua_State *L) {
+    struct zip *zip_s = get_zip_ref(L, 1);
+
+    const char *filename = luaL_check_string(L, 2);
+
+    unsigned int flag = (unsigned int) lua_getnumber(L, lua_getparam(L, 3));
+    flag = flag == 0 ? ZIP_FL_ENC_GUESS : flag;
+
+    zip_int64_t index = zip_name_locate(zip_s, filename, flag);
+
+    lua_pushnumber(L, index); // index of file or -1
+}
+
 static struct luaL_reg lzip[] = {
     {"zip_open", lzip_open},
     {"zip_close", lzip_close},
@@ -93,6 +107,7 @@ static struct luaL_reg lzip[] = {
     {"zip_add_dir", lzip_add_dir},
     {"zip_add_file", lzip_add_file},
     {"zip_get_num_entries", lzip_get_num_entries},
+    {"zip_name_locate", lzip_name_locate}
 };
 
 
@@ -129,5 +144,29 @@ int LUA_LIBRARY lua_lzipopen(lua_State *L) {
     // set_table(L, flags, "ZIP_RDONLY:", ZIP_RDONLY);
 
     lua_pushobject(L, flags); // end table
+
+    // create the global table encoding
+    lua_Object encoding = lua_createtable(L);
+
+    lua_pushobject(L, encoding);
+    lua_setglobal(L, "zip_file_encoding");
+
+    // ZIP_FL_NOCASE: Ignore case distinctions. (Will only work well if the file names are ASCII.)
+    set_table(L, encoding, "ZIP_FL_NOCASE", ZIP_FL_NOCASE);
+
+    // ZIP_FL_NODIR: Ignore directory part of file name in archive.
+    set_table(L, encoding, "ZIP_FL_NODIR", ZIP_FL_NODIR);
+
+    // ZIP_FL_ENC_RAW: Compare against the unmodified names as it is in the ZIP archive.
+    set_table(L, encoding, "ZIP_FL_ENC_RAW", ZIP_FL_ENC_RAW);
+
+    // ZIP_FL_ENC_GUESS: (Default.) Guess the encoding of the name in the ZIP archive and convert it to UTF-8,
+    // if necessary, before comparing.
+    set_table(L, encoding, "ZIP_FL_ENC_GUESS", ZIP_FL_ENC_GUESS);
+
+    // ZIP_FL_ENC_STRICT: Follow the ZIP specification and expect CP-437 encoded names in the ZIP archive
+    // (except if they are explicitly marked as UTF-8). Convert it to UTF-8 before comparing.
+    // Note: ASCII is a subset of both CP-437 and UTF-8.
+    set_table(L, encoding, "ZIP_FL_ENC_STRICT", ZIP_FL_ENC_STRICT);
     return 0;
 }
