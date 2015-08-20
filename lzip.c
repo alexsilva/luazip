@@ -12,10 +12,11 @@
 
 
 static struct zip *get_zip_ref(lua_State *L, int n) {
-    struct zip * zip_s = lua_getuserdata(L, lua_getparam(L, n));  // implicit cast
-    if (!zip_s)
-        lua_error(L, "You need to pass the zip object as the first parameter." \
-                     "\nCall 'zip_open' to initialize the object.");
+    lua_Object zip_lobj = lua_getparam(L, n);
+    struct zip *zip_s = lua_getuserdata(L, zip_lobj);
+    if (!zip_s || !lua_isuserdata(L, zip_lobj))
+        lua_error(L, "need to pass the zip object as the first parameter." \
+                     "\ncall 'zip_open' to initialize the object.");
     return zip_s;
 }
 
