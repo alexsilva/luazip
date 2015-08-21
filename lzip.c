@@ -258,7 +258,7 @@ int LUA_LIBRARY lua_lzipopen(lua_State *L) {
     set_table(L, flags, "ZIP_TRUNCATE", ZIP_TRUNCATE);
 
     // ZIP_RDONLY: Open archive in read-only mode.
-    // set_table(L, flags, "ZIP_RDONLY:", ZIP_RDONLY);
+    set_table(L, flags, "ZIP_RDONLY", ZIP_RDONLY);
 
     lua_pushobject(L, flags); // end table
 
