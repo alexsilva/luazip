@@ -51,13 +51,16 @@ local zip_filename = samples_dir .."/sample2.zip";
 
 local status, zip = zip_open(zip_filename, zip_open_flags.ZIP_CREATE)
 
+print("zip_open: ", status, zip)
+
 if (status ~= 0) then
-    print(format("[%i] %s", status, zip))
+    print(format("zip_open error: [%i] %s", status, zip))
 else
     local dirname = "zipfile/samples"
     print("dir created:", zip_add_dir(zip, dirname))
 
-    zip_add_file(zip, samples_dir .."/sample.zip", dirname.."/sample.zip")
+    -- add file by path
+    print("zip_add_file: ", zip_add_file(zip, samples_dir .."/sample.zip", dirname.."/sample.zip"))
 
     -- num of entries
     print("zip_get_num_entries: ", zip_get_num_entries(zip))
@@ -69,13 +72,15 @@ else
     print("zip_close: ", zip_close(zip))
 end
 
-status, zip = zip_open(zip_filename)
 local code, msg
+status, zip = zip_open(zip_filename)
 
 if (status == 0) then
     code, msg = unzip(zip, samples_dir.."/extractfiles")
     print("unzip status:", code, msg)
     print("zip_close: ", zip_close(zip))
+else
+    print("zip_open: ", status, zip, zip_filename)
 end
 
 code, msg = unzip_filepath(samples_dir.."/sample.zip", samples_dir.."/extractfiles")
