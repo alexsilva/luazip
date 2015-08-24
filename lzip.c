@@ -7,7 +7,6 @@
 #include "utils.h"
 
 #define ZIP_ERRBUF  2048
-#define UNZIP_DMODE 0755
 #define UNZIP_BUF   5120
 
 
@@ -113,7 +112,7 @@ static void lzip_name_locate(lua_State *L) {
     lua_pushnumber(L, index); // index of file or -1
 }
 
-static struct unzip_st unzip(struct zip *zip_s, const char *dirname) {
+static struct unzip_st unzip(struct zip *zip_s, const char *dirbase) {
     struct zip_file *zf;
     struct zip_stat sb;
     char buf[UNZIP_BUF];
@@ -127,10 +126,10 @@ static struct unzip_st unzip(struct zip *zip_s, const char *dirname) {
     st.msg = "OK";
 
     // container dir
-    size_t slen = strlen(dirname);
+    size_t slen = strlen(dirbase);
 
-    if (dirname[slen - 1] != '.') {
-        if (mkdirs(dirname, UNZIP_DMODE) == -1) {
+    if (dirbase[slen - 1] != '.') {
+        if (mkdirs(dirbase, UNZIP_DMODE) == -1) {
             st.code = UNZIP_ERROR;
             st.msg  = "error creating base directory";
             return st;
@@ -141,7 +140,7 @@ static struct unzip_st unzip(struct zip *zip_s, const char *dirname) {
             len = strlen(sb.name);
 
             char abspath[len + slen + 1];
-            join(&abspath[0], dirname, sb.name);
+            join(&abspath[0], dirbase, sb.name);
 
             if (sb.name[len - 1] == '/') {
                 if (mkdirs(abspath, UNZIP_DMODE) == -1) {
@@ -156,11 +155,20 @@ static struct unzip_st unzip(struct zip *zip_s, const char *dirname) {
                     st.msg  = "error opening file in the index";
                     break;
                 }
+                // If the directory exists 'open' must not fail
                 fd = open(abspath, O_RDWR | O_TRUNC | O_CREAT | O_BINARY, 0644);
                 if (fd < 0) {
-                    st.code = UNZIP_ERROR;
-                    st.msg  = "error opening file";
-                    break;
+                    // libzip does not have an internal record of the file being created directory,
+                    // then this is the cause of the first failure. We try to create the file
+                    // directory to solve the problem.
+                    if (create_required_missing_dir(&abspath[0]) == 0) {
+                        fd = open(abspath, O_RDWR | O_TRUNC | O_CREAT | O_BINARY, 0644);
+                    }
+                    if (fd < 0) {
+                        st.code = UNZIP_ERROR;
+                        st.msg = "error opening file";
+                        break;
+                    }
                 }
                 sum = 0;
                 while (sum != sb.size) {

@@ -7,6 +7,8 @@
 #include <io.h>
 #include <errno.h>
 #include <assert.h>
+#include <sys/stat.h>
+#include <libgen.h>
 
 /* Creates a new directory considering the execution platform */
 int create_dir(const char *dir, mode_t mode) {
@@ -38,7 +40,7 @@ int mkdirs(const char *dir, mode_t mode) {
 /* Joins two paths considering the platform sep (\\|/)*/
 void join(char* destination, const char* path1, const char* path2) {
     if(path1 == NULL && path2 == NULL) {
-        strcpy(destination, "");;
+        strcpy(destination, "");
     }
     else if(path2 == NULL || strlen(path2) == 0) {
         strcpy(destination, path1);
@@ -63,4 +65,34 @@ void join(char* destination, const char* path1, const char* path2) {
             strcat(destination, directory_separator);
         strcat(destination, path2);
     }
+}
+
+/* Checks whether the directory exists in the file system. */
+bool dir_exists(const char *dir) {
+    struct stat sb;
+    return stat(dir, &sb) == 0 && S_ISDIR(sb.st_mode);
+}
+
+/* Create the absolute path directory if it does not exist. Must be path to a file (/home/user/file.zip) */
+int create_required_missing_dir(char *abspath) {
+    int slen = strlen(abspath);
+    char _abspath[slen];
+
+    strcpy(&_abspath[0], abspath);
+
+    char *filedir = dirname(_abspath);
+
+    if (!dir_exists(filedir)) {
+        slen = strlen(filedir);
+        if (filedir[slen - 1] != '/') {
+            char fddest[slen + 2];
+            strcpy(&fddest[0], filedir);
+
+            fddest[slen] = '/';
+            fddest[slen + 1] = '\0';
+
+            return mkdirs(fddest, UNZIP_DMODE);
+        }
+    }
+    return -1;
 }
