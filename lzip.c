@@ -209,6 +209,10 @@ static struct unzip_st unzip(struct zip *zip_s, const char *dirbase) {
                 close(fd);
                 zip_fclose(zf);
             }
+        } else {
+            st.code = UNZIP_ERROR;
+            st.msg  = "unable to read the index of the zip file";
+            break;
         }
     }
     return st;
