@@ -73,7 +73,7 @@ else
 end
 
 local code, msg
-status, zip = zip_open(zip_filename, zip_file_encoding.ZIP_RDONLY)
+status, zip = zip_open(zip_filename, zip_open_flags.ZIP_RDONLY)
 
 if (status == 0) then
     code, msg = unzip(zip, samples_dir.."/extractfiles")
