@@ -4,6 +4,7 @@
 #include "lzip.h"
 #include <unistd.h>
 #include <fcntl.h>
+#include <libgen.h>
 #include "utils.h"
 
 #define ZIP_ERRBUF  2048
@@ -83,9 +84,25 @@ static void lzip_add_file(lua_State *L) {
     const char *sfilepath = luaL_check_string(L, 2);
     const char *tfilepath = luaL_check_string(L, 3);
 
+    // It allows the user to have control over the creation of directories.
+    bool ireldir = ((int) lua_getnumber(L, lua_getparam(L, 4)) > 0);
+
     struct zip_source * source_t;
     source_t = zip_source_file(zip_s, sfilepath, 0, -1);
 
+    if (!ireldir) {
+        int slen = strlen(tfilepath);
+        char filedir[slen + 1];
+
+        strcpy(&filedir[0], tfilepath);
+        char *fdir = dirname(&filedir[0]);
+
+        if (fdir != NULL) {
+            int fdlen = strlen(fdir);
+            if (fdlen > 0 && fdir[fdlen - 1] != '.')
+                zip_add_dir(zip_s, fdir);
+        }
+    }
     zip_int64_t index = zip_file_add(zip_s, tfilepath, source_t, ZIP_FL_ENC_UTF_8);
 
     lua_pushnumber(L, index);
