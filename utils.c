@@ -6,7 +6,6 @@
 #include <string.h>
 #include <io.h>
 #include <errno.h>
-#include <assert.h>
 #include <sys/stat.h>
 #include <libgen.h>
 
@@ -23,7 +22,8 @@ int create_dir(const char *dir, mode_t mode) {
 
 /* Create a directory tree based on the given path */
 int mkdirs(const char *dir, mode_t mode) {
-    assert(dir && *dir);
+    if (!dir || strlen(dir) == 0)
+        return -1;  // invalid directory.
     char* p;
     for (p=strchr(dir +1, PATH_SEP); p; p=strchr(p+1, PATH_SEP)) {
         *p='\0';
