@@ -76,13 +76,12 @@ bool dir_exists(const char *dir) {
 /* Create the absolute path directory if it does not exist. Must be path to a file (/home/user/file.zip) */
 int create_required_missing_dir(char *abspath) {
     int slen = strlen(abspath);
-    char _abspath[slen];
+    char dirpath[slen];
 
-    strcpy(&_abspath[0], abspath);
+    strcpy(&dirpath[0], abspath);
+    char *filedir = dirname(dirpath);
 
-    char *filedir = dirname(_abspath);
-
-    if (!dir_exists(filedir)) {
+    if (filedir != NULL && !dir_exists(filedir)) {
         slen = strlen(filedir);
         if (filedir[slen - 1] != '/') {
             char fddest[slen + 2];
