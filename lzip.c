@@ -151,7 +151,7 @@ static struct unzip_st unzip(struct zip *zip_s, const char *dirbase) {
     size_t slen = strlen(dirbase);
 
     if (dirbase[slen - 1] != '.') {
-        if (mkdirs(dirbase, UNZIP_DMODE) == -1) {
+        if (!dir_exists(dirbase) && mkdirs(dirbase, UNZIP_DMODE) == -1) {
             st.code = UNZIP_ERROR;
             st.msg  = "error creating base directory";
             return st;
@@ -165,7 +165,7 @@ static struct unzip_st unzip(struct zip *zip_s, const char *dirbase) {
             join(&abspath[0], dirbase, sb.name);
 
             if (sb.name[len - 1] == '/') {
-                if (mkdirs(abspath, UNZIP_DMODE) == -1) {
+                if (!dir_exists(dirbase) && mkdirs(abspath, UNZIP_DMODE) == -1) {
                     st.code = UNZIP_ERROR;
                     st.msg  = "error creating directory";
                     return st;
