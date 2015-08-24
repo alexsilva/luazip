@@ -37,19 +37,22 @@ static void lzip_open(lua_State *L) {
 
     zip_s = zip_open(path, flags, &zep);
 
-    // push status code
-    lua_pushnumber(L, zep);
-
     // check for errors
     if (zep > 0) {
+        // push status code
+        lua_pushnumber(L, zep);
         char buf[ZIP_ERRBUF];
         int slen = zip_error_to_str(buf, sizeof(buf), zep, errno);
         // push error message
         lua_pushlstring(L, buf, slen);
     } else if (!zip_s) {
+        // push status code
+        lua_pushnumber(L, -1);
         // unknown error.
-        lua_pushstring(L, "Zip can not be initialized. Unknown error.");
+        lua_pushstring(L, "zip can not be initialized. unknown error.");
     } else {
+        // push status code
+        lua_pushnumber(L, zep);
         // push zip object opened
         lua_pushuserdata(L, zip_s);
     }
