@@ -91,6 +91,7 @@ static void lzip_add_file(lua_State *L) {
     source_t = zip_source_file(zip_s, sfilepath, 0, -1);
 
     if (!ireldir) {
+        // creates the relative directory within the zip.
         int slen = strlen(tfilepath);
         char filedir[slen + 1];
 
