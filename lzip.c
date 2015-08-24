@@ -168,7 +168,7 @@ static struct unzip_st unzip(struct zip *zip_s, const char *dirbase) {
             join(&abspath[0], dirbase, sb.name);
 
             if (sb.name[len - 1] == '/') {
-                if (!dir_exists(dirbase) && mkdirs(abspath, UNZIP_DMODE) == -1) {
+                if (!dir_exists(abspath) && mkdirs(abspath, UNZIP_DMODE) == -1) {
                     st.code = UNZIP_ERROR;
                     st.msg  = "error creating directory";
                     return st;
