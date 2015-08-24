@@ -143,6 +143,10 @@ static struct unzip_st unzip(struct zip *zip_s, const char *dirbase) {
     st.code = UNZIP_SUCCESS;
     st.msg = "OK";
 
+    if (dirbase == NULL || strlen(dirbase) == 0) {
+        char buff[PATH_MAX + 1];
+        dirbase = getcwd(buff, PATH_MAX + 1);
+    }
     // container dir
     size_t slen = strlen(dirbase);
 
