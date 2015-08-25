@@ -7,11 +7,9 @@
 
 #include <lua.h>
 
-#if defined(_MSC_VER)
-    //  Microsoft
-    #define LUA_LIBRARY __declspec(dllexport)
-#else
-//  GCC
+#if defined(_WIN32) //  Microsoft
+#define LUA_LIBRARY __declspec(dllexport)
+#else //  Linux
 #define LUA_LIBRARY __attribute__((visibility("default")))
 #endif
 
