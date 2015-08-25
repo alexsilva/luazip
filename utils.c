@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <libgen.h>
+#include <stdio.h>
 
 /* Creates a new directory considering the execution platform */
 int create_dir(const char *dir, mode_t mode) {
@@ -17,8 +18,6 @@ int create_dir(const char *dir, mode_t mode) {
     return mkdir(dir);
 #endif
 }
-
-#define PATH_SEP '/'
 
 /* Create a directory tree based on the given path */
 int mkdirs(const char *dir, mode_t mode) {
@@ -38,32 +37,30 @@ int mkdirs(const char *dir, mode_t mode) {
 }
 
 /* Joins two paths considering the platform sep (\\|/)*/
-void join(char* destination, const char* path1, const char* path2) {
+void join(char* dest, const char* path1, const char* path2) {
     if(path1 == NULL && path2 == NULL) {
-        strcpy(destination, "");
+        strcpy(dest, "");
     }
     else if(path2 == NULL || strlen(path2) == 0) {
-        strcpy(destination, path1);
+        strcpy(dest, path1);
     }
     else if(path1 == NULL || strlen(path1) == 0) {
-        strcpy(destination, path2);
+        strcpy(dest, path2);
     }
     else {
         char directory_separator[] = "/";
-#ifdef _MSC_VER
-        directory_separator[0] = '\\';
-#endif
-        const char *last_char = path1;
-        while(*last_char != '\0')
-            last_char++;
+        const char *last_char = path1 + strlen(path1) - 1;
         int append_directory_separator = 0;
+
         if(strcmp(last_char, directory_separator) != 0) {
             append_directory_separator = 1;
         }
-        strcpy(destination, path1);
-        if(append_directory_separator)
-            strcat(destination, directory_separator);
-        strcat(destination, path2);
+        strcpy(dest, path1);
+
+        if(append_directory_separator) {
+            strcat(dest, directory_separator);
+        }
+        strcat(dest, path2);
     }
 }
 

@@ -153,25 +153,27 @@ static struct unzip_st unzip(struct zip *zip_s, const char *dirbase) {
     // container dir
     size_t slen = strlen(dirbase);
 
-    if (dirbase[slen - 1] != '.') {
-        if (!dir_exists(dirbase) && mkdirs(dirbase, UNZIP_DMODE) == -1) {
-            st.code = UNZIP_ERROR;
-            st.msg  = "error creating base directory";
-            return st;
-        }
+    if (dirbase[slen - 1] != '.' && !dir_exists(dirbase) && mkdirs(dirbase, UNZIP_DMODE) == -1) {
+        st.code = UNZIP_ERROR;
+        st.msg  = "error creating base directory";
+        return st;
     }
+
     for (index = 0; index < zip_get_num_entries(zip_s, 0); index++) {
         if (zip_stat_index(zip_s, index, 0, &sb) == 0) {
             len = strlen(sb.name);
-
-            char abspath[len + slen + 1];
-            join(&abspath[0], dirbase, sb.name);
+            char abspath[len + slen + 2];
+            join(abspath, dirbase, sb.name);
 
             if (sb.name[len - 1] == '/') {
-                if (!dir_exists(abspath) && mkdirs(abspath, UNZIP_DMODE) == -1) {
-                    st.code = UNZIP_ERROR;
-                    st.msg  = "error creating directory";
-                    return st;
+                abspath[strlen(abspath) - 1] = '\0'; // change
+                if (!dir_exists(abspath)) {
+                    abspath[strlen(abspath)] = PATH_SEP; // restore
+                    if (mkdirs(abspath, UNZIP_DMODE) == -1) {
+                        st.code = UNZIP_ERROR;
+                        st.msg = "error creating directory";
+                        return st;
+                    }
                 }
             } else {
                 zf = zip_fopen_index(zip_s, index, 0);

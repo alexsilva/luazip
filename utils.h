@@ -10,6 +10,8 @@
 
 #define UNZIP_DMODE 0755
 
+#define PATH_SEP '/'
+
 void join(char*, const char*, const char*);
 int create_dir(const char *, mode_t);
 int mkdirs(const char *, mode_t);
