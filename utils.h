@@ -15,7 +15,7 @@
 void join(char*, const char*, const char*);
 int create_dir(const char *, mode_t);
 int mkdirs(const char *, mode_t);
-bool dir_exists(const char *);
+bool dexists(const char *);
 int create_required_missing_dir(char *);
 
 #endif //LUAZIP_ZIP_UTILS_H

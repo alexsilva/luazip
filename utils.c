@@ -65,7 +65,7 @@ void join(char* dest, const char* path1, const char* path2) {
 }
 
 /* Checks whether the directory exists in the file system. */
-bool dir_exists(const char *dir) {
+bool dexists(const char *dir) {
     struct stat sb;
     return stat(dir, &sb) == 0 && S_ISDIR(sb.st_mode);
 }
@@ -78,7 +78,7 @@ int create_required_missing_dir(char *abspath) {
     strcpy(&dirpath[0], abspath);
     char *filedir = dirname(dirpath);
 
-    if (filedir != NULL && !dir_exists(filedir)) {
+    if (filedir != NULL && !dexists(filedir)) {
         slen = strlen(filedir);
         if (filedir[slen - 1] != '/') {
             char fddest[slen + 2];
