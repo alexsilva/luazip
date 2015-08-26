@@ -4,7 +4,9 @@
 
 #include "utils.h"
 #include <string.h>
+#ifdef _WIN32
 #include <io.h>
+#endif
 #include <errno.h>
 #include <sys/stat.h>
 #include <libgen.h>
