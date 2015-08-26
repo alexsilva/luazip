@@ -5,6 +5,9 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <libgen.h>
+#ifdef __linux__
+#include <linux/limits.h>
+#endif
 #include "utils.h"
 
 #define ZIP_ERRBUF  2048
