@@ -7,6 +7,7 @@
 #include <libgen.h>
 #ifdef __linux__
 #include <linux/limits.h>
+#define O_BINARY 0
 #endif
 #include "utils.h"
 
