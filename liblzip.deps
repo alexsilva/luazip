@@ -1,2 +1,3 @@
 # Defines the shared libraries that are module dependent (can not be removed).
+libs/libz
 libs/libzip
